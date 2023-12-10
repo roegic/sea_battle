@@ -1,12 +1,12 @@
-#include "headers/menu.h"
+#include "../headers/menu.h"
 
-void drawTitle(){
+void DrawTitle(){
     std::cout << "------------------------------------------------- \n";
     std::cout << "             EPIC SEA BATTLE GAME  \n";
     std::cout << "-------------------------------------------------\n";
 }
 
-void showMenu(){
+void ShowMenu(){
 
     std::cout << " 1. Start Game"<< std::endl;
     std::cout << " 2. Exit Game\n"<< std::endl;
