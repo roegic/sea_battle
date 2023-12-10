@@ -1,0 +1,8 @@
+//
+// Created by 79116 on 10.12.2023.
+//
+
+#ifndef SEA_BATTLE_GAME_UPDATE_H
+#define SEA_BATTLE_GAME_UPDATE_H
+
+#endif //SEA_BATTLE_GAME_UPDATE_H
