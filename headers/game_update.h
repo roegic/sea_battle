@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../headers/player.h"
+#include "player.h"
 #include <iostream>
 
 using namespace std;
