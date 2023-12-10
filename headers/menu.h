@@ -4,6 +4,6 @@
 
 using namespace std;
 
-void drawTitle();
+void DrawTitle();
 
-void showMenu();
+void ShowMenu();
