@@ -1,4 +1,4 @@
-#include "headers/player.h"
+#include "../headers/player.h"
 #include <iostream>
 
 void Player::CreateShip() {
