@@ -2,27 +2,32 @@
 
 #include <string>
 #include <vector>
-#include "Field.h"
-#include "Ship.h"
+#include "field.h"
+#include "ship.h"
 
 using namespace std;
 class Player {
 private:
-    string name;
-    Field field;
-    vector<Ship *> ships;
+    string name_;
+    Field field_;
+    vector<Ship *> ships_;
 public:
-    void draw_field();
+    void DrawField();
 
-    void set_player_name(string name);
+    void SetPlayerName(string name);
 
-    string get_player_name();
-    bool fire_enemy(int x, int y);
-    bool place_ship(int x, int y, int direction, int idx);
-    bool is_lost_check();
+    string GetPlayerName();
 
-    void drawEnemyField(); // показывает черновик что где может быть у противника
-    bool isHitTwice(int xcord, int ycord);
+    bool FireEnemy(int x, int y);
 
-    void create_ships();
+    bool PlaceShip(int x, int y, int direction, int idx);
+
+    bool IsLost();
+
+
+    void DrawHitFlield();  // показывает черновик что где может быть у противника
+
+    bool IsHitTwice(int x, int y);
+
+    void CreateShip();
 };
