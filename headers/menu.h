@@ -1,9 +1,8 @@
 #pragma once
-#include <iostream>
-#include <string>
 
-using namespace std;
+#include <iostream>
+#include "Player.h"
 
 void DrawTitle();
 
-void ShowMenu();
+void ShowMenu(Player &player1, Player &player2);

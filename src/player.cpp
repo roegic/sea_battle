@@ -29,7 +29,7 @@ bool Player::IsLost() {
             deadShips++;
         }
     }
-    return (deadShips >= 5); // todo - this is bs!!!
+    return (deadShips == ships_.size()); // todo - this is bs!!!
 }
 
 
