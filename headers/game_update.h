@@ -1,8 +1,12 @@
-//
-// Created by 79116 on 10.12.2023.
-//
+#pragma once
 
-#ifndef SEA_BATTLE_GAME_UPDATE_H
-#define SEA_BATTLE_GAME_UPDATE_H
+#include "../headers/player.h"
+#include <iostream>
 
-#endif //SEA_BATTLE_GAME_UPDATE_H
+using namespace std;
+
+void AddShips (Player &player);
+void GetCoordinatesFire(Player &player1, Player &player2);
+void EnterToContinue();
+void GetCoordinates(char &xc, char &yc);
+void GetDirection(int &direction);
