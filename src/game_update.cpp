@@ -124,22 +124,69 @@ void GetCoordinates(char &xc, char &yc, int type) {
         }
     }
 }
+void send_to_host() {
+  int cur_idx=0;
+  std::vector<std::string> shipName = {"Battleship", "Cruiser", "Destroyer",
+                                       "Submarine"};
+  std::vector<int> sizeShip = {4, 3, 2, 1};
+  for (int i = 0; i < shipName.size(); ++i) {
+    for (int j = 0; j < 5 - sizeShip[i]; ++j) {
+      send_coords_to_packet(client_field[cur_idx].first,
+                            client_field[cur_idx].second,
+                            client_directions[cur_idx]);
+      cur_idx++;
+    }
+  }
+  send_packet();
+}
+void get_field_from_client() {
+
+  int cur_idx=0;
+  std::vector<std::string> shipName = {"Battleship", "Cruiser", "Destroyer",
+                                       "Submarine"};
+  std::vector<int> sizeShip = {4, 3, 2, 1};
+
+  while (true) {
+    if(is_packet_recieved()) {
+      for (int i = 0; i < shipName.size(); ++i) {
+        for (int j = 0; j < 5 - sizeShip[i]; ++j) {
+          client_field.push_back({0, 0});
+          client_directions.push_back(0);
+          vector<int> data = get_3_packet_data();
+          client_field[cur_idx].first = data[0];
+          client_field[cur_idx].second = data[1];
+          client_directions[cur_idx] = data[2];
+          cur_idx++;
+        }
+      }
+      break;
+    }
+  }
+}
 
 void AddShips(Player &player, int type) {
   // addship for the given player object
-  std::string table = "--------------------------------------------- \n               Add Ship\n--------------------------------------------- \n           No  Name        size\n--------------------------------------------- \n           1   Battleship   4 \n           2   Cruiser      3 \n           3   Destroyer    2 \n           4   Submarine    1 \n--------------------------------------------- \n";
+  std::string table =
+      "--------------------------------------------- \n               Add "
+      "Ship\n--------------------------------------------- \n           No  "
+      "Name        size\n--------------------------------------------- \n      "
+      "     1   Battleship   4 \n           2   Cruiser      3 \n           3  "
+      " Destroyer    2 \n           4   Submarine    1 "
+      "\n--------------------------------------------- \n";
   cout << table;
 
-  std::vector<std::string> shipName = {"Battleship","Cruiser","Destroyer", "Submarine"};
+  std::vector<std::string> shipName = {"Battleship", "Cruiser", "Destroyer",
+                                       "Submarine"};
   std::vector<int> sizeShip = {4, 3, 2, 1};
   char x_enter;
   char y_enter;
   int direction;
 
-  for(int i = 0; i < shipName.size(); ++i) {
+  for (int i = 0; i < shipName.size(); ++i) {
     for (int j = 0; j < 5 - sizeShip[i]; ++j) {
       while (true) {
-        cout << player.GetPlayerName() << " add a " << shipName[i] << " size: " << sizeShip[i] << endl;
+        cout << player.GetPlayerName() << " add a " << shipName[i]
+             << " size: " << sizeShip[i] << endl;
         GetCoordinates(x_enter, y_enter, type);
         if (sizeShip[i] == 1) {
           direction = 2;
@@ -148,12 +195,20 @@ void AddShips(Player &player, int type) {
         }
         int x = toupper(x_enter) - 'A';
         int y = y_enter - '0' - 1;
+        if (type == 2) {
+          server_field.push_back({x,y});
+          server_directions.push_back({direction});
+        }
+        if (type == 3) {
+          client_field.push_back({x,y});
+          client_directions.push_back({direction});
+        }
         if (player.PlaceShip(x, y, direction, i)) {
           break;
         } else {
-            cout << "The location of the ships is incorrect! \nShips should not "
-                    "overlap, go beyond borders!\nPlease try again."
-                 << endl;
+          cout << "The location of the ships is incorrect! \nShips should not "
+                  "overlap, go beyond borders!\nPlease try again."
+               << endl;
         }
       }
       cout << "\x1B[2J\x1B[H" << endl;
@@ -161,9 +216,18 @@ void AddShips(Player &player, int type) {
       cout << "\n";
     }
   }
-  cout<< "All ships are added!"<<endl;
+  if (type == 2) { // type = 2 means it is host we need to get clients data
+    get_field_from_client();
+    //send_to_client();
+  }
+  if (type == 3) { // type = 3 means it is client we need to get clients data
+    send_to_host();
+    //get_field_from_host();
+  }
+
+  cout << "All ships are added!" << endl;
   EnterToContinue();
-}
+
 
 void EnterToContinue() {
   cout<<"Press enter to continue!";
