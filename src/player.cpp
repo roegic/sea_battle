@@ -22,16 +22,16 @@ bool Player::PlaceShip(int x, int y, int direction, int idx) {
     return field_.PlaceShip(x, y, direction, ships_[idx]);
 }
 
-bool Player::IsLost() {
-    int deadShips = 0;
-    for (int i = 0; i < ships_.size(); i++) {
-        if (ships_[i]->IsSunk()) {
-            deadShips++;
-        }
+bool Player::IsWin() {
+    if (hits_ == 0) {
+        return true;
     }
-    return (deadShips == ships_.size()); // todo - this is bs!!!
+    return false;
 }
 
+void Player::DecHits() {
+    hits_--;
+}
 
 void Player::DrawHitFlield() {
     cout << "   ";

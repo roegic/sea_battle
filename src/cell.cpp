@@ -29,7 +29,4 @@ void Cell::SetSpace() {
 
 void Cell::Fire() {
     is_fired_ = true;
-    if (ship_) {
-        ship_->Hit();
-    }
 }

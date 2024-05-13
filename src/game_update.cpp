@@ -19,11 +19,11 @@ void GetCoordinatesFire(Player &player1, Player &player2) {
       selectedPlayer = &player2;
       otherPlayer = &player1;
     }
-    if (player1.IsLost()){
+    if (player2.IsWin()){
       cout << "\nPlayer " << player2.GetPlayerName() << " you won!" << endl;
       break;
     }
-    if(player2.IsLost()){
+    if(player1.IsWin()){
       cout << "\nPlayer " << player1.GetPlayerName() << " you won!" << endl;
       break;
     }
@@ -39,6 +39,8 @@ void GetCoordinatesFire(Player &player1, Player &player2) {
       if(!otherPlayer->IsHitTwice(x, y)){
         if(otherPlayer->FireEnemy(x, y)){
           cout << "It's a Hit!"<<endl;
+            turn--;
+            selectedPlayer->DecHits();
         }else{
           cout << "It's a miss!"<<endl;
         }
