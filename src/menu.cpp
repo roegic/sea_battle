@@ -37,17 +37,21 @@ void ShowMenu(Player &player1, Player &player2, char& type) {
             std::cout<< "Command is not correct. You should enter 1 or 4"<< std::endl;
         }
     }
-//  std::cout << " Enter player1 name: ";
-//  getline(cin,player_name);
-//  player1.SetPlayerName(player_name);
-//
-//  std::cout << "\n";
-//  std::cout << "\x1B[2J\x1B[H" << std::endl; // эта магия отчищает консоль, но работает на OSX только
-//  std::cout << " Enter player2 name: ";
-//  getline(cin,player_name);
-//  player2.SetPlayerName(player_name);
-    player1.SetPlayerName("Player1");
-    player2.SetPlayerName("Player2");
+    if (type == 1) {
+        std::cout << " Enter player1 name: ";
+        getline(cin,player_name);
+        player1.SetPlayerName(player_name);
+
+        std::cout << "\n";
+        std::cout << "\x1B[2J\x1B[H" << std::endl; // эта магия отчищает консоль, но работает на OSX только
+        std::cout << " Enter player2 name: ";
+        getline(cin,player_name);
+        player2.SetPlayerName(player_name);
+    } else { // todo needs fix when multiplayer
+      player1.SetPlayerName("Player1");
+      player2.SetPlayerName("Player2");
+    }
+
 
     std::cout << "\n";
     std::cout << "\x1B[2J\x1B[H" << std::endl;
