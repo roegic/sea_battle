@@ -100,10 +100,12 @@ void GetCoordinates(char &xc, char &yc, int type) {
     if (x_enter.length() == 2) {
       if (!isalpha(x_enter[0])) {
         cout << invalid_input << endl;
-      } else if (!(toupper(x_enter[0]) - 'A' < 10 && toupper(x_enter[0]) - 'A' >= 0)) {
+      } else if (!(toupper(x_enter[0]) - 'A' < 9 && toupper(x_enter[0]) - 'A' >= 0)) {
         cout << invalid_input << endl;
       } else if (!isdigit(x_enter[1])) {
         cout << invalid_input << endl;
+      } else if (x_enter[1] - '0' < 1 || x_enter[1] - '0' >= 9) {
+          cout << invalid_input << endl;
       } else {
         xc = toupper(x_enter[0]);
         yc = x_enter[1];
