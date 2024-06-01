@@ -17,16 +17,18 @@ int main() {
     ShowMenu(player1, player2, type);
 
     if (type == 'l') {
-        AddShips(player2, 1);
-        AddShips(player1, 1);
+        AddShips(player2, player1, 1); //todo здесь по сути не нужен other_player но такая сигнатура
+        AddShips(player1, player2, 1);
+        GetCoordinatesFire(player1, player2, 1); // todo move it to addShip
     }
     if (type == 'h') {
-        AddShips(player1, 2);
+        AddShips(player1, player2, 2);
+        GetCoordinatesFire(player1, player2, 2); // todo move it to addShip
     }
     if (type == 'j') {
-        AddShips(player2, 3);
+        AddShips(player2, player1, 3);
+        GetCoordinatesFire(player1, player2, 3); // todo move it to addShip
     }
 
 
-    GetCoordinatesFire(player1, player2); // todo move it to addShip
 }

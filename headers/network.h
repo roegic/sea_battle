@@ -11,4 +11,6 @@ int send_client_direction(int direction);
 int recieve_client_direction();
 void send_packet();
 std::vector<int> get_3_packet_data();
+std::pair<int,int> get_fire_coords_packet();
+void send_fire_coords_to_packet(int x, int y);
 bool is_packet_recieved();

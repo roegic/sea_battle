@@ -12,8 +12,29 @@ vector<pair<int, int>> server_field;
 vector<int> server_directions;
 int SHIPS_CNT = 10;
 
-void GetCoordinatesFire(Player &player1, Player &player2) {
+pair<int,int> get_fire_coords_from_other() {
+  int x=0;
+  int y=0;
+  while (true) {
+    if (is_packet_recieved()) {
+      pair<int,int> coords_received = get_fire_coords_packet();
+      x = coords_received.first;
+      y = coords_received.second;
+      break;
+    }
+  }
+  return {x,y};
+}
+
+
+
+void GetCoordinatesFire(Player &player1, Player &player2, int type) {
     int turn = 1;
+
+//    if (type == 3) { // первым начинает клиент
+//      cout << "\nTurn: " << turn << "\nPlayer " << player2.GetPlayerName()
+//           << " enter coordinates to Fire \n \n";
+//    }
     while (true) {
         Player *selectedPlayer;
         Player *otherPlayer;
@@ -32,16 +53,59 @@ void GetCoordinatesFire(Player &player1, Player &player2) {
             cout << "\nPlayer " << player1.GetPlayerName() << " you won!" << endl;
             break;
         }
-        cout << "\nTurn: " << turn << "\nPlayer " << selectedPlayer->GetPlayerName()
+//        cout << "\nTurn: " << turn << "\nPlayer " << selectedPlayer->GetPlayerName()
+//             << " enter coordinates to Fire \n \n";
+        //todo это не работает
+        if (type == 3) {
+          otherPlayer->DrawHitFlield();
+        }
+        if (type == 2) {
+          selectedPlayer->DrawHitFlield(); //todo вот тут или там other player or player
+        }
+        if (type == 1) {
+          otherPlayer->DrawHitFlield();
+        }
+        cout << "\nTurn: " << turn << "\nPlayer " << otherPlayer->GetPlayerName()
              << " enter coordinates to Fire \n \n";
-        otherPlayer->DrawHitFlield();
+
 
         char xc;
         char yc;
         while (true) {
-            GetCoordinates(xc, yc, 1); // TODO ЭТО ПРОСТО СЕЙЧАС ЗАГЛУШКАА NEEDS FIXXX
-            int x = toupper(xc) - 'A';
-            int y = (yc - '0') - 1;
+            int x,y;
+            if (type == 1) {
+              GetCoordinates(xc, yc, type);
+              x = toupper(xc) - 'A';
+              y = (yc - '0') - 1;
+            }
+            if (type == 2) { // хост
+              if (turn %2 == 0) { //ход хоста
+                GetCoordinates(xc, yc, type);
+                x = toupper(xc) - 'A';
+                y = (yc - '0') - 1;
+                send_fire_coords_to_packet(x,y);
+              } else { // ждем ответа от клиента
+                pair<int,int> fire_coords = get_fire_coords_from_other();
+                x = fire_coords.first;
+                y=fire_coords.second;
+                int t =0;
+              }
+            }
+            if (type == 3) { // client
+              if (turn %2 == 1) { // clients move
+                GetCoordinates(xc, yc, type);
+                x = toupper(xc) - 'A';
+                y = (yc - '0') - 1;
+                send_fire_coords_to_packet(x,y);
+              } else { // ждем ответа от host
+                pair<int,int> fire_coords = get_fire_coords_from_other();
+                x = fire_coords.first;
+                y=fire_coords.second;
+                int t =0;
+              }
+            }
+
+
             if (!otherPlayer->IsHitTwice(x, y)) {
                 if (otherPlayer->FireEnemy(x, y)) {
                     cout << "It's a Hit!" << endl;
@@ -59,6 +123,7 @@ void GetCoordinatesFire(Player &player1, Player &player2) {
         cout << "\n";
         EnterToContinue();
         turn++;
+
     }
     cout << "\n";
 }
@@ -156,7 +221,7 @@ void send_to_host() {
   send_packet();
 }
 
-void get_field_from_client() {
+void get_field_from_client(Player &other_player) {
 
   int cur_idx=0;
   std::vector<std::string> shipName = {"Battleship", "Cruiser", "Destroyer",
@@ -172,7 +237,11 @@ void get_field_from_client() {
           vector<int> data = get_3_packet_data();
           client_field[cur_idx].first = data[0];
           client_field[cur_idx].second = data[1];
-          client_directions[cur_idx] = data[2];
+          client_directions[cur_idx] = data[2]; //todo these are for debug only
+          int x= data[0];
+          int y=data[1];
+          int direction = data[2];
+          other_player.PlaceShip(x, y, direction, i);
           cur_idx++;
         }
       }
@@ -180,7 +249,7 @@ void get_field_from_client() {
     }
   }
 }
-void get_field_from_host() {
+void get_field_from_host(Player &other_player) {
 
   int cur_idx=0;
   std::vector<std::string> shipName = {"Battleship", "Cruiser", "Destroyer",
@@ -196,7 +265,11 @@ void get_field_from_host() {
           vector<int> data = get_3_packet_data();
           server_field[cur_idx].first = data[0];
           server_field[cur_idx].second = data[1];
-          server_directions[cur_idx] = data[2];
+          server_directions[cur_idx] = data[2]; //todo server_field and server_dir are for debug only
+          int x= data[0];
+          int y=data[1];
+          int direction = data[2];
+          other_player.PlaceShip(x, y, direction, i);
           cur_idx++;
         }
       }
@@ -205,7 +278,7 @@ void get_field_from_host() {
   }
 }
 
-void AddShips(Player &player, int type) {
+void AddShips(Player &player, Player &other_player, int type) {
   // addship for the given player object
   std::string table =
       "--------------------------------------------- \n               Add "
@@ -258,16 +331,27 @@ void AddShips(Player &player, int type) {
     }
   }
   if (type == 2) { // type = 2 means it is host we need to get clients data
-    get_field_from_client();
+    get_field_from_client(other_player);
     send_to_client();
+
   }
   if (type == 3) { // type = 3 means it is client we need to get clients data
     send_to_host();
-    get_field_from_host();
+    get_field_from_host(other_player);
   }
 
   cout << "All ships are added!" << endl;
   EnterToContinue();
+
+  if (type == 1) {
+    GetCoordinatesFire(player, other_player, 1);
+  }
+
+  if (type == 2) {
+    GetCoordinatesFire(player, other_player, 2); // todo move it to addShip
+  } else {
+    GetCoordinatesFire(other_player,player, 3); // todo move it to addShip
+  }
 }
 
 void EnterToContinue() {

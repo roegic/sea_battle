@@ -1,7 +1,7 @@
 #pragma once
 
 #include <iostream>
-#include "Player.h"
+#include "player.h"
 #include "network.h"
 using namespace std;
 

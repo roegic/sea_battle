@@ -105,6 +105,17 @@ vector<int> get_3_packet_data(){
   packet>>vec[0]>>vec[1]>>vec[2];
   return vec;
 }
+std::pair<int,int> get_fire_coords_packet() {
+  pair<int,int> coords = {0,0};
+  packet>>coords.first>>coords.second;
+  return coords;
+}
+void send_fire_coords_to_packet(int x, int y) {
+  packet.clear();
+  packet << x << y;
+  socket.send(packet);
+
+}
 bool is_packet_recieved(){
   if(socket.receive(packet) == sf::Socket::Done){
     return true;
