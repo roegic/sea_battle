@@ -30,5 +30,4 @@ int main() {
         GetCoordinatesFire(player1, player2, 3); // todo move it to addShip
     }
 
-
 }

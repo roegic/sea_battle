@@ -57,10 +57,18 @@ void GetCoordinatesFire(Player &player1, Player &player2, int type) {
 //             << " enter coordinates to Fire \n \n";
         //todo это не работает
         if (type == 3) {
-          otherPlayer->DrawHitFlield();
+          if (turn % 2 == 1) {
+            otherPlayer->DrawHitFlield();
+          } else {
+            selectedPlayer->DrawHitFlield();
+          }
         }
         if (type == 2) {
-          selectedPlayer->DrawHitFlield(); //todo вот тут или там other player or player
+          if (turn % 2 == 0) {
+            otherPlayer->DrawHitFlield();
+          } else {
+            selectedPlayer->DrawHitFlield();
+          }
         }
         if (type == 1) {
           otherPlayer->DrawHitFlield();
@@ -350,8 +358,9 @@ void AddShips(Player &player, Player &other_player, int type) {
   if (type == 2) {
     GetCoordinatesFire(player, other_player, 2); // todo move it to addShip
   } else {
-    GetCoordinatesFire(other_player,player, 3); // todo move it to addShip
+    GetCoordinatesFire(other_player, player, 3); // todo move it to addShip
   }
+
 }
 
 void EnterToContinue() {
