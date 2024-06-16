@@ -25,8 +25,8 @@ void ShowMenu(Player &player1, Player &player2, char& type) {
             break;
         }  else if (command_type == "2") {
             std::cout << "\x1B[2J\x1B[H" << std::endl;
-            std::cout << "\n Sorry, this feature is not implemented yet, right now option 1 works :)" << std::endl;
-            exit(0);
+            type = 'c';
+            break;
         } else if (command_type == "3") {
             std::cout << "\x1B[2J\x1B[H" << std::endl;
             type = create_connection();
@@ -39,17 +39,24 @@ void ShowMenu(Player &player1, Player &player2, char& type) {
     }
     if (type == 1) {
         std::cout << " Enter player1 name: ";
-        getline(cin,player_name);
+        getline(cin, player_name);
         player1.SetPlayerName(player_name);
 
         std::cout << "\n";
         std::cout << "\x1B[2J\x1B[H" << std::endl; // эта магия отчищает консоль, но работает на OSX только
         std::cout << " Enter player2 name: ";
-        getline(cin,player_name);
+        getline(cin, player_name);
         player2.SetPlayerName(player_name);
+    } else if (type = 0) {
+            std::cout << " Enter player1 name: ";
+            getline(cin,player_name);
+            player1.SetPlayerName(player_name);
+            player2.SetPlayerName("Computer");
+            std::cout << "\n";
+            std::cout << "\x1B[2J\x1B[H" << std::endl;
     } else { // todo needs fix when multiplayer
-      player1.SetPlayerName("Player1");
-      player2.SetPlayerName("Player2");
+        player1.SetPlayerName("Player1");
+        player2.SetPlayerName("Player2");
     }
 
 

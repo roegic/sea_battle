@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <cctype>
+#include <tuple>
 
 string invalid_input = "Invalid input! Please try again";
 vector<pair<int, int>> client_field;
@@ -46,10 +47,22 @@ void GetCoordinatesFire(Player &player1, Player &player2, int type) {
             otherPlayer = &player1;
         }
         if (player2.IsWin()) {
+            if (type == 0) {
+                if (player2.GetPlayerName() == "Computer") {
+                    cout << "\nPlayer " << player1.GetPlayerName() << " you lose!" << endl;
+                    break;
+                }
+            }
             cout << "\nPlayer " << player2.GetPlayerName() << " you won!" << endl;
             break;
         }
         if (player1.IsWin()) {
+            if (type == 0) {
+                if (player1.GetPlayerName() == "Computer") {
+                    cout << "\nPlayer " << player2.GetPlayerName() << " you lose!" << endl;
+                    break;
+                }
+            }
             cout << "\nPlayer " << player1.GetPlayerName() << " you won!" << endl;
             break;
         }
@@ -57,60 +70,68 @@ void GetCoordinatesFire(Player &player1, Player &player2, int type) {
 //             << " enter coordinates to Fire \n \n";
         //todo это не работает
         if (type == 3) {
-          if (turn % 2 == 1) {
-            otherPlayer->DrawHitFlield();
-          } else {
-            selectedPlayer->DrawHitFlield();
-          }
+            if (turn % 2 == 1) {
+                otherPlayer->DrawHitFlield();
+            } else {
+                selectedPlayer->DrawHitFlield();
+            }
         }
         if (type == 2) {
-          if (turn % 2 == 0) {
-            otherPlayer->DrawHitFlield();
-          } else {
-            selectedPlayer->DrawHitFlield();
-          }
+            if (turn % 2 == 0) {
+                otherPlayer->DrawHitFlield();
+            } else {
+                selectedPlayer->DrawHitFlield();
+            }
         }
-        if (type == 1) {
-          otherPlayer->DrawHitFlield();
+        if (type == 1 || type == 0) {
+            otherPlayer->DrawHitFlield();
         }
         cout << "\nTurn: " << turn << "\nPlayer " << otherPlayer->GetPlayerName()
              << " enter coordinates to Fire \n \n";
+
 
 
         char xc;
         char yc;
         while (true) {
             int x,y;
-            if (type == 1) {
-              GetCoordinates(xc, yc, type);
-              x = toupper(xc) - 'A';
-              y = (yc - '0') - 1;
+            if (type == 1 || (type == 0 && otherPlayer->GetPlayerName() != "Computer")) {
+                GetCoordinates(xc, yc, type);
+                x = toupper(xc) - 'A';
+                y = (yc - '0') - 1;
+            }
+            if (type == 0) {
+                if (otherPlayer->GetPlayerName() == "Computer") {
+                    x = rand() % 8;
+                    y = rand() % 8;
+                    cout << "Computer hits " << char(x + 'A') << char(y + 1 + '0') <<'\n';
+                }
             }
             if (type == 2) { // хост
-              if (turn %2 == 0) { //ход хоста
-                GetCoordinates(xc, yc, type);
-                x = toupper(xc) - 'A';
-                y = (yc - '0') - 1;
-                send_fire_coords_to_packet(x,y);
-              } else { // ждем ответа от клиента
-                pair<int,int> fire_coords = get_fire_coords_from_other();
-                x = fire_coords.first;
-                y=fire_coords.second;
-                int t =0;
-              }
+                if (turn %2 == 0) { //ход хоста
+                    GetCoordinates(xc, yc, type);
+                    x = toupper(xc) - 'A';
+                    y = (yc - '0') - 1;
+                    send_fire_coords_to_packet(x,y);
+                } else { // ждем ответа от клиента
+                    pair<int,int> fire_coords = get_fire_coords_from_other();
+                    x = fire_coords.first;
+                    y=fire_coords.second;
+                    int t =0;
+                }
             }
             if (type == 3) { // client
-              if (turn %2 == 1) { // clients move
-                GetCoordinates(xc, yc, type);
-                x = toupper(xc) - 'A';
-                y = (yc - '0') - 1;
-                send_fire_coords_to_packet(x,y);
-              } else { // ждем ответа от host
-                pair<int,int> fire_coords = get_fire_coords_from_other();
-                x = fire_coords.first;
-                y=fire_coords.second;
-                int t =0;
-              }
+                if (turn %2 == 1) { // clients move
+                    GetCoordinates(xc, yc, type);
+                    x = toupper(xc) - 'A';
+                    y = (yc - '0') - 1;
+                    send_fire_coords_to_packet(x,y);
+                } else { // ждем ответа от host
+                    pair<int,int> fire_coords = get_fire_coords_from_other();
+                    x = fire_coords.first;
+                    y=fire_coords.second;
+                    int t =0;
+                }
             }
 
 
@@ -118,7 +139,7 @@ void GetCoordinatesFire(Player &player1, Player &player2, int type) {
                 if (otherPlayer->FireEnemy(x, y)) {
                     cout << "It's a Hit!" << endl;
                     turn--;
-                    selectedPlayer->DecHits();
+                    otherPlayer->DecHits();
                 } else {
                     cout << "It's a miss!" << endl;
                 }
@@ -197,6 +218,7 @@ void GetCoordinates(char &xc, char &yc, int type) {
         }
     }
 }
+
 void send_to_client() {
   int cur_idx=0;
   std::vector<std::string> shipName = {"Battleship", "Cruiser", "Destroyer",
@@ -347,17 +369,20 @@ void AddShips(Player &player, Player &other_player, int type) {
     send_to_host();
     get_field_from_host(other_player);
   }
+  if (type == 0) {
+      PlaceShipsAutomatically(other_player);
+  }
 
   cout << "All ships are added!" << endl;
   EnterToContinue();
 
-  if (type == 1) {
-    GetCoordinatesFire(player, other_player, 1);
-  }
+//  if (type == 1) {
+//    GetCoordinatesFire(player, other_player, 1);
+//  }
 
   if (type == 2) {
     GetCoordinatesFire(player, other_player, 2); // todo move it to addShip
-  } else {
+  } else if (type == 3) {
     GetCoordinatesFire(other_player, player, 3); // todo move it to addShip
   }
 
@@ -367,4 +392,25 @@ void EnterToContinue() {
   cout<<"Press enter to continue!";
   cin.ignore();
   cout << "\x1B[2J\x1B[H"<<endl;
+}
+
+void PlaceShipsAutomatically(Player &player) {
+    std::vector<std::string> shipName = {"Battleship", "Cruiser", "Destroyer", "Submarine"};
+    std::vector<int> sizeShip = {4, 3, 2, 1};
+    std::vector<int> shipCount = {1, 2, 3, 4};  // Количество кораблей каждого типа
+
+    srand(time(0));
+
+    for (int i = 0; i < shipName.size(); ++i) {
+        for (int j = 0; j < shipCount[i]; ++j) {
+            while (true) {
+                int x = rand() % 8;
+                int y = rand() % 8;
+                int direction = rand() % 4 + 1; // 1: Up, 2: Right, 3: Down, 4: Left
+                if (player.PlaceShip(x, y, direction, i)) {
+                    break;
+                }
+            }
+        }
+    }
 }
